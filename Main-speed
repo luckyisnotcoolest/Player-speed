@@ -1,0 +1,71 @@
+-- Player speed adjustment script
+local player = game.Players.LocalPlayer
+local character = script.Parent
+local humanoid = character:WaitForChild("Humanoid")
+local rootPart = humanoid.RootPart
+local Camera = workspace.CurrentCamera
+
+-- Set the default walk speed
+humanoid.WalkSpeed = 16
+
+-- Create a variable to store the slide speed multiplier
+local slideSpeedMultiplier = 1.8
+
+-- Create a function to detect when the player is sliding
+local function isSliding()
+    -- Check if the player is on a slope (you can adjust the angle threshold as needed)
+    local slopeAngle = math.abs(rootPart.Velocity.Unit.y)
+    if slopeAngle > 0.5 then
+        return true
+    else
+        return false
+    end
+end
+
+-- Create a function to update the player's speed
+local function updateSpeed()
+    if isSliding() then
+        -- Increase the player's speed when sliding
+        humanoid.WalkSpeed = 100
+    else
+        -- Reset the player's speed when not sliding
+        humanoid.WalkSpeed = 16
+    end
+end
+
+-- Create a GUI to control the player's speed
+local gui = Instance.new("ScreenGui")
+gui.Parent = player.PlayerGui
+
+local speedSlider = Instance.new("Slider")
+speedSlider.Parent = gui
+speedSlider.BackgroundColor3 = Color3.new(1, 1, 1)
+speedSlider.BorderColor3 = Color3.new(0, 0, 0)
+speedSlider.Position = UDim2.new(0.5, 0, 0.5, 0)
+speedSlider.Size = UDim2.new(0, 200, 0, 20)
+speedSlider.MinValue = 1
+speedSlider.MaxValue = 10
+speedSlider.Value = 1
+
+local speedLabel = Instance.new("TextLabel")
+speedLabel.Parent = gui
+speedLabel.BackgroundColor3 = Color3.new(1, 1, 1)
+speedLabel.BorderColor3 = Color3.new(0, 0, 0)
+speedLabel.Position = UDim2.new(0.5, 0, 0.5, 30)
+speedLabel.Size = UDim2.new(0, 200, 0, 20)
+speedLabel.Font = Enum.Font.SourceSans
+speedLabel.FontSize = Enum.FontSize.Size24
+speedLabel.Text = "Speed: 16"
+
+-- Update the player's speed based on the slider value
+speedSlider.Changed:Connect(function()
+    local speedValue = speedSlider.Value
+    humanoid.WalkSpeed = 16 * speedValue
+    speedLabel.Text = "Speed: ".. tostring(humanoid.WalkSpeed)
+end)
+
+-- Update the player's speed every frame
+while true do
+    updateSpeed()
+    wait()
+end
